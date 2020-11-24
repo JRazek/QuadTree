@@ -5,8 +5,11 @@
 using namespace std;
 
 const int mod = 1000000007;
+struct QuadTree;
+struct Union{
+    unordered_set<QuadTree *> elements;
+};
 
-struct Union;
 struct QuadTree{
     int type;
     QuadTree * parent;
@@ -29,16 +32,8 @@ struct QuadTree{
             rightBot = new QuadTree(numInTreeDescription, treeDescription, this);
         }
     }
-
-    vector<Union *> findUnions{
-
-    };
-
 };
 
-struct Union{
-    unordered_set<QuadTree *> elements;
-};
 
 int main() {
     int treeHeight;
