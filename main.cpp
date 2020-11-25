@@ -32,6 +32,21 @@ struct QuadTree{
             rightBot = new QuadTree(numInTreeDescription, treeDescription, this);
         }
     }
+    vector<Union *> unionDFS(int side = -1){
+        if(type == 1){
+            Union * u = new Union();
+            u->elements.insert(this);
+            return {u};
+        }
+        else if(type == 4){
+            vector<Union *> unions;
+            if(leftUp->type == 1 || leftUp->type == 4 && leftBot->type == 1 || leftBot->type == 4) {
+                leftBot->unionDFS(0);
+                
+            }
+        }
+        return {};
+    }
 };
 
 
