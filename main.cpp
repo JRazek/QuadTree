@@ -9,7 +9,16 @@ struct QuadTree;
 struct Union{
     unordered_set<QuadTree *> elements;
 };
-
+void mergeUnions(Union * u1, Union * u2){
+    u1->elements.merge(u2->elements);
+    delete u2;
+}
+struct Quartet{
+    unordered_set<QuadTree *> up;
+    unordered_set<QuadTree *> left;
+    unordered_set<QuadTree *> right;
+    unordered_set<QuadTree *> bot;
+};
 struct QuadTree{
     int type;
     QuadTree * parent;
@@ -32,22 +41,54 @@ struct QuadTree{
             rightBot = new QuadTree(numInTreeDescription, treeDescription, this);
         }
     }
-    vector<Union *> unionDFS(int side = -1){
-        if(type == 1){
-            Union * u = new Union();
-            u->elements.insert(this);
-            return {u};
+    void unionDFS(){
+        Quartet q = subRegions();
+        cout<<"";
+    }
+
+private:
+    Quartet subRegions(){
+
+        Quartet q = Quartet();
+
+        if(this->type == 4) {
+            Quartet tmpLeftUp = leftUp->subRegions();
+
+            Quartet tmpRightUp = rightUp->subRegions();
+
+            Quartet tmpLeftBot = leftBot->subRegions();
+
+            Quartet tmpRightBot = rightBot->subRegions();
+
+            unordered_set<QuadTree *> upperEdge = tmpLeftUp.up;
+            upperEdge.insert(tmpRightUp.up.begin(), tmpRightUp.up.end());
+
+            unordered_set<QuadTree *> leftEdge = tmpLeftUp.left;
+            leftEdge.insert(tmpLeftBot.left.begin(), tmpLeftBot.left.end());
+
+
+            unordered_set<QuadTree *> botEdge = tmpLeftBot.bot;
+            botEdge.insert(tmpRightUp.bot.begin(), tmpRightUp.bot.end());
+
+            unordered_set<QuadTree *> rightEdge =  tmpRightUp.right;
+            rightEdge.insert(tmpRightBot.right.begin(), tmpRightBot.right.end());
+
+
+            q.up = upperEdge;
+            q.left = leftEdge;
+            q.right = rightEdge;
+            q.bot = botEdge;
         }
-        else if(type == 4){
-            vector<Union *> unions;
-            if(leftUp->type == 1 || leftUp->type == 4 && leftBot->type == 1 || leftBot->type == 4) {
-                leftBot->unionDFS(0);
-                
-            }
+        else if(this->type == 1){
+            q.up.insert(this);
+            q.left.insert(this);
+            q.bot.insert(this);
+            q.right.insert(this);
         }
-        return {};
+    return q;
     }
 };
+
 
 
 int main() {
@@ -58,5 +99,6 @@ int main() {
 
     int num = 0;
     QuadTree quadTree(num, treeDescription);
+    quadTree.unionDFS();
     return 0;
 }
