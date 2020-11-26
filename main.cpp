@@ -78,6 +78,10 @@ private:
             q.left = leftEdge;
             q.right = rightEdge;
             q.bot = botEdge;
+
+            
+
+
         }
         else if(this->type == 1){
             q.up.insert(this);
