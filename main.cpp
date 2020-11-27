@@ -13,7 +13,8 @@ void mergeUnions(Union * u1, Union * u2){
     u1->elements.merge(u2->elements);
     delete u2;
 }
-struct Quartet{
+
+struct SquareEdges{
     unordered_set<QuadTree *> up;
     unordered_set<QuadTree *> left;
     unordered_set<QuadTree *> right;
@@ -42,23 +43,25 @@ struct QuadTree{
         }
     }
     void unionDFS(){
-        Quartet q = subRegions();
+        SquareEdges q = subRegions();
         cout<<"";
     }
 
 private:
-    Quartet subRegions(){
+    SquareEdges subRegions(int side = -1){
 
-        Quartet q = Quartet();
+        SquareEdges q = SquareEdges();
 
         if(this->type == 4) {
-            Quartet tmpLeftUp = leftUp->subRegions();
+            SquareEdges tmpLeftUp = leftUp->subRegions(0);
 
-            Quartet tmpRightUp = rightUp->subRegions();
+            SquareEdges tmpLeftBot = leftBot->subRegions(1);
 
-            Quartet tmpLeftBot = leftBot->subRegions();
+            SquareEdges tmpRightBot = rightBot->subRegions(2);
 
-            Quartet tmpRightBot = rightBot->subRegions();
+            SquareEdges tmpRightUp = rightUp->subRegions(3);
+
+
 
             unordered_set<QuadTree *> upperEdge = tmpLeftUp.up;
             upperEdge.insert(tmpRightUp.up.begin(), tmpRightUp.up.end());
@@ -78,10 +81,6 @@ private:
             q.left = leftEdge;
             q.right = rightEdge;
             q.bot = botEdge;
-
-            
-
-
         }
         else if(this->type == 1){
             q.up.insert(this);
@@ -89,7 +88,8 @@ private:
             q.bot.insert(this);
             q.right.insert(this);
         }
-    return q;
+
+        return q;
     }
 };
 
