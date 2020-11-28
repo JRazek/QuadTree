@@ -20,6 +20,20 @@ struct SquareEdges{
     unordered_set<QuadTree *> right;
     unordered_set<QuadTree *> bot;
 };
+
+struct PathNode{
+    PathNode(int type, QuadTree * nodeInQuadTree){
+        this->type = type;
+        this->nodeInQuadTree = nodeInQuadTree;
+    }
+    QuadTree * nodeInQuadTree;
+    int type;
+    PathNode * NW;
+    PathNode * SW;
+    PathNode * NE;
+    PathNode * SE;
+};
+
 struct QuadTree{
     int type;
     QuadTree * parent;
@@ -42,54 +56,40 @@ struct QuadTree{
             rightBot = new QuadTree(numInTreeDescription, treeDescription, this);
         }
     }
+
+
     void unionDFS(){
-        SquareEdges q = subRegions();
+
         cout<<"";
     }
 
 private:
-    SquareEdges subRegions(int side = -1){
 
-        SquareEdges q = SquareEdges();
+    PathNode * subRegions(){
 
         if(this->type == 4) {
-            SquareEdges tmpLeftUp = leftUp->subRegions(0);
+            PathNode * NW = this->leftUp->subRegions();
+            PathNode * SW = this->leftBot->subRegions();
+            PathNode * NE = this->rightUp->subRegions();
+            PathNode * SE = this->rightBot->subRegions();
 
-            SquareEdges tmpLeftBot = leftBot->subRegions(1);
-
-            SquareEdges tmpRightBot = rightBot->subRegions(2);
-
-            SquareEdges tmpRightUp = rightUp->subRegions(3);
-
-
-
-            unordered_set<QuadTree *> upperEdge = tmpLeftUp.up;
-            upperEdge.insert(tmpRightUp.up.begin(), tmpRightUp.up.end());
-
-            unordered_set<QuadTree *> leftEdge = tmpLeftUp.left;
-            leftEdge.insert(tmpLeftBot.left.begin(), tmpLeftBot.left.end());
-
-
-            unordered_set<QuadTree *> botEdge = tmpLeftBot.bot;
-            botEdge.insert(tmpRightUp.bot.begin(), tmpRightUp.bot.end());
-
-            unordered_set<QuadTree *> rightEdge =  tmpRightUp.right;
-            rightEdge.insert(tmpRightBot.right.begin(), tmpRightBot.right.end());
+            PathNode * p = new PathNode(4, this);
+            if(NW != nullptr)
+                p->NW = NW;
+            if(SW != nullptr)
+                p->SW = SW;
+            if(NE != nullptr)
+                p->NE = NE;
+            if(SE != nullptr)
+                p->SE = SE;
 
 
-            q.up = upperEdge;
-            q.left = leftEdge;
-            q.right = rightEdge;
-            q.bot = botEdge;
+
+            return p;
+        }else if(this->type == 1){
+            return new PathNode(1, this);
         }
-        else if(this->type == 1){
-            q.up.insert(this);
-            q.left.insert(this);
-            q.bot.insert(this);
-            q.right.insert(this);
-        }
-
-        return q;
+        return nullptr;
     }
 };
 
