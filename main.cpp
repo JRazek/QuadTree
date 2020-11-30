@@ -33,9 +33,20 @@ struct PathNode{
     PathNode * NE;
     PathNode * SE;
 };
-
+struct Vector2I{
+    int x, y;
+    Vector2I(int x, int y){
+        this->x = x, this->y = y;
+    }
+};
 struct QuadTree{
     int type;
+
+    vector<bool> posX;//each num stands for the power of 2. First stands for m, second for m-1
+    vector<bool> posY;
+
+    int size;// the power of 2
+
     QuadTree * parent;
 
     QuadTree * leftUp;
@@ -65,31 +76,10 @@ struct QuadTree{
 
 private:
 
-    PathNode * subRegions(){
+    void subRegions(){
+        if(this->type == 1){
 
-        if(this->type == 4) {
-            PathNode * NW = this->leftUp->subRegions();
-            PathNode * SW = this->leftBot->subRegions();
-            PathNode * NE = this->rightUp->subRegions();
-            PathNode * SE = this->rightBot->subRegions();
-
-            PathNode * p = new PathNode(4, this);
-            if(NW != nullptr)
-                p->NW = NW;
-            if(SW != nullptr)
-                p->SW = SW;
-            if(NE != nullptr)
-                p->NE = NE;
-            if(SE != nullptr)
-                p->SE = SE;
-
-
-
-            return p;
-        }else if(this->type == 1){
-            return new PathNode(1, this);
         }
-        return nullptr;
     }
 };
 
