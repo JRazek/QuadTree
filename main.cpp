@@ -59,16 +59,21 @@ struct QuadTree{
         QuadNode * SE;
     };
     QuadNode * root;
+    vector<QuadNode *> nodes ;
     const int depth;
     const string description;
     QuadTree(string description, int depth) : description(description), depth(depth){
         int currID = 0;
         this->root = new QuadNode(currID, this->description[0] - '0', 0);
+
         stack<pair<QuadNode *, int>> pq;
         pq.push(make_pair(root, 0));
         while(!pq.empty()){
             QuadNode * q = pq.top().first;
             int entryNum = pq.top().second;
+            if(entryNum == 0){
+                nodes.push_back(q);
+            }
             if(q->type == 4) {
                 QuadNode *child = new QuadNode(++currID, description[currID] - '0', q->level + 1);
                 switch (entryNum) {
@@ -95,7 +100,13 @@ struct QuadTree{
             }
         }
     }
+    void dfsMark(){
+        stack<pair<QuadNode *, int>> pq;
+        pq.push(make_pair(root, 0));
+        while (!pq.empty()){
 
+        }
+    }
     ~QuadTree(){
         delete root;
     }
@@ -114,5 +125,6 @@ int main() {
 
     QuadTree q = QuadTree(treeDescription, num);
     //quadTree.unionDFS();
+    q.dfsMark();
     return 0;
 }
