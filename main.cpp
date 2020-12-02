@@ -3,8 +3,9 @@
 #include <unordered_set>
 #include <stack>
 #include <math.h>
-
-
+#include <sys/time.h>
+#include <sys/resource.h>
+#include <set>
 using namespace std;
 
 const int mod = 1e9+7;
@@ -24,18 +25,6 @@ struct SquareEdges{
     unordered_set<QuadTree *> bot;
 };
 
-struct PathNode{
-    PathNode(int type, QuadTree * nodeInQuadTree){
-        this->type = type;
-        this->nodeInQuadTree = nodeInQuadTree;
-    }
-    QuadTree * nodeInQuadTree;
-    int type;
-    PathNode * NW;
-    PathNode * SW;
-    PathNode * NE;
-    PathNode * SE;
-};
 struct Vector2F{
     float x, y;
     Vector2F(float x, float y){
@@ -49,33 +38,46 @@ struct Vector2F{
 };
 struct QuadTree{
     struct QuadNode{
-        QuadNode(int id, int type, int level) : id(id), type(type), level(level){};
+        QuadNode(int id, int type, int level, Vector2F pos, QuadNode * p = NULL) : id(id), type(type), pos(pos), level(level){
+            this->parent = p;
+        };
+        Vector2F pos;
         const int id;
         const int level;
         const int type;
+
+        QuadNode * parent;
+
         QuadNode * NW;
         QuadNode * NE;
         QuadNode * SW;
         QuadNode * SE;
+
     };
+
     QuadNode * root;
     vector<QuadNode *> nodes ;
     const int depth;
     const string description;
+
+    int deepestNodeHeight = 0;
+
     QuadTree(string description, int depth) : description(description), depth(depth){
         int currID = 0;
-        this->root = new QuadNode(currID, this->description[0] - '0', 0);
+        this->root = new QuadNode(currID, this->description[0] - '0',  0, Vector2F(0,0));
 
         stack<pair<QuadNode *, int>> pq;
         pq.push(make_pair(root, 0));
         while(!pq.empty()){
             QuadNode * q = pq.top().first;
             int entryNum = pq.top().second;
+            if(q->level > deepestNodeHeight)
+                deepestNodeHeight = q->level;
             if(entryNum == 0){
                 nodes.push_back(q);
             }
             if(q->type == 4) {
-                QuadNode *child = new QuadNode(++currID, description[currID] - '0', q->level + 1);
+                QuadNode * child = new QuadNode(++currID, description[currID] - '0', q->level + 1, Vector2F(0,0), q);
                 switch (entryNum) {
                     case 0:
                         q->NW = child;
@@ -100,11 +102,19 @@ struct QuadTree{
             }
         }
     }
-    void dfsMark(){
-        stack<pair<QuadNode *, int>> pq;
-        pq.push(make_pair(root, 0));
-        while (!pq.empty()){
 
+
+    struct Edge{
+
+    };
+
+    void dfsMark(QuadNode * n){
+        if(n->type == 4){
+            dfsMark(n->NW);
+
+            dfsMark(n->NE);
+            dfsMark(n->SW);
+            dfsMark(n->SE);
         }
     }
     ~QuadTree(){
@@ -116,6 +126,11 @@ struct QuadTree{
 
 
 int main() {
+    rlimit * f = new rlimit();
+    f->rlim_cur = 200000000;
+    f->rlim_max = 250000000;
+    setrlimit(RLIMIT_STACK, f);
+
     int treeHeight;
     string treeDescription;
     cin >> treeHeight;
@@ -125,6 +140,6 @@ int main() {
 
     QuadTree q = QuadTree(treeDescription, num);
     //quadTree.unionDFS();
-    q.dfsMark();
+    q.dfsMark(q.root);
     return 0;
 }
